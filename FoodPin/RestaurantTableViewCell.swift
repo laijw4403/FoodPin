@@ -20,6 +20,7 @@ class RestaurantTableViewCell: UITableViewCell {
             thumbnailImageView.clipsToBounds = true      // 設定圖形可以修剪為圓角
         }
     } */
+    @IBOutlet var heartImageView: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
