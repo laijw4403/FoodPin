@@ -15,13 +15,14 @@ class RestaurantTableViewController: UITableViewController {
     
     var restaurantLocation = ["Hong Kong", "Hong kong", "Hong kong", "Hong kong", "Hong kong", "Hong kong", "Hong kong", "Sydney", "Sydney", "Sydney", "New York", "New York", "New York", "New York", "New York", "New York", "New York", "London", "London", "London", "London"]
     
-    var restaurantType = ["Coffee & Tea Shop", "Cafe", "Tea House", "Austrain / Causual Drink", "French", "Bakery", "Chocolate", "Cafe", "American / Seafood", "American", "American", "Breakfast & Brunch", "Coffee & Tea", "Coffee & Tea", "Latin American", "Spanish", "Spanish", "Spanish", "British", "Thai"]
+    var restaurantType = ["Coffee & Tea Shop", "Cafe", "Tea House", "Austrain / Causual Drink", "French", "Bakery", "Bakery", "Chocolate", "Cafe", "American / Seafood", "American", "American", "Breakfast & Brunch", "Coffee & Tea", "Coffee & Tea", "Latin American", "Spanish", "Spanish", "Spanish", "British", "Thai"]
     
     // 建立21個存放Boolean值false的陣列
     var restaurantIsVisited = Array(repeating: false, count: 21)
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        // 自動調整cell寬度
+        tableView.cellLayoutMarginsFollowReadableWidth = true
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -29,10 +30,11 @@ class RestaurantTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
     
-    override func didReceiveMemoryWarning() {
+    /*override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+        
         // Dispose of any resources that can be recreated.
-    }
+    }*/
 
     // MARK: - Table view data source
     
@@ -58,23 +60,28 @@ class RestaurantTableViewController: UITableViewController {
         cell.thumbnailImageView.image = UIImage(named: restaurantImages[indexPath.row])
         cell.locationLabel.text = restaurantLocation[indexPath.row]
         cell.typeLabel.text = restaurantType[indexPath.row]
-        // 被打勾時需顯示此圖示
+        
+        // 被打勾時需顯示此圖示 Exercise2
         cell.heartImageView.isHidden = !restaurantIsVisited[indexPath.row]
+        
         // 檢查餐廳是否有被勾選起來
-        if restaurantIsVisited[indexPath.row] {
+        /*if restaurantIsVisited[indexPath.row] {
             cell.accessoryType = .checkmark
         } else {
             cell.accessoryType = .none
-        }
-        // 上列if可化簡為 cell.accessoryType = restaurantIsVisited[indexPath.row] ? .checkmark : .none
+        }*/
+        
+        // 上列if可化簡為
+        cell.accessoryType = restaurantIsVisited[indexPath.row] ? .checkmark : .none
         return cell
     }
+// MARK: - UITableViewDelegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // 建立一個選單作為動作清單
         let optionMenu = UIAlertController(title: nil, message: "What do you want to do?", preferredStyle: .actionSheet)
         
-        // for iPad setting popover
+        // For iPad setting 彈出矩形視窗
         if let popoverController = optionMenu.popoverPresentationController {
             if let cell = tableView.cellForRow(at: indexPath) {
                 popoverController.sourceView = cell
@@ -134,8 +141,109 @@ class RestaurantTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: false)
     }
     
-
     /*
+    // 新增左滑一列時出現Delete按鈕
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        // 從資料模型將資料刪除
+        if editingStyle == .delete {
+            restaurantType.remove(at: indexPath.row)
+            restaurantIsVisited.remove(at: indexPath.row)
+            restaurantNames.remove(at: indexPath.row)
+            restaurantImages.remove(at: indexPath.row)
+            restaurantLocation.remove(at: indexPath.row)
+        }
+        
+        // reload 方法一
+        // tableView.reloadData()
+        
+        // reload 方法二 第一個參數為索引路徑的陣列，第二個參數為動畫類型
+        tableView.deleteRows(at: [indexPath], with: .fade)
+        
+        print("Total item: \(restaurantNames.count)")
+        for name in restaurantNames {
+            print(name)
+        }
+    }
+    */
+    
+    // 重建Delete功能以及加上一個Share按鈕，使用被定義在UITableViewDelegate的方法
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, sourceView, completionHandler) in
+        
+            // 從資料來源刪除列
+            self.restaurantNames.remove(at: indexPath.row)
+            self.restaurantLocation.remove(at: indexPath.row)
+            self.restaurantImages.remove(at: indexPath.row)
+            self.restaurantType.remove(at: indexPath.row)
+            
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            // 呼叫完成處理器來取消動作按鈕
+            completionHandler(true)
+            
+        }
+        
+        let shareAction = UIContextualAction(style: .normal, title: "Share") { (action, sourceView, completionHandler) in
+            let defaultText = "Just checking in at" + self.restaurantNames[indexPath.row]
+            let activityController: UIActivityViewController
+            
+            // if let 用於確認UIImage(Optional)是否有值
+            if let imageToShare = UIImage(named: self.restaurantImages[indexPath.row]) {
+                activityController = UIActivityViewController(activityItems: [defaultText, imageToShare], applicationActivities: nil)
+            } else {
+                activityController = UIActivityViewController(activityItems: [defaultText], applicationActivities: nil)
+            }
+            
+            // For iPad setting 彈出矩形視窗
+            if let popoverController = activityController.popoverPresentationController {
+                if let cell = tableView.cellForRow(at: indexPath) {
+                    popoverController.sourceView = cell
+                    popoverController.sourceRect = cell.bounds
+                }
+            }
+            // 呈現畫面
+            self.present(activityController, animated: true, completion: nil)
+            completionHandler(true)
+        }
+        
+        deleteAction.backgroundColor = UIColor(red: 231.0/255.0, green: 76.0/255.0, blue: 60.0/255.0, alpha: 1.0)
+        deleteAction.image = UIImage(systemName: "trash")
+        
+        shareAction.backgroundColor = UIColor(red: 254.0/255.0, green: 149.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        shareAction.image = UIImage(systemName: "square.and.arrow.up")
+        
+        // 以UIContextualAction物件的陣列，回傳一個UISwipeActionsConfiguration的物件
+        let swipeConfiguration = UISwipeActionsConfiguration(actions: [deleteAction, shareAction])
+        return swipeConfiguration
+        
+    }
+    
+    // ch11 exercise
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let checkinAction = UIContextualAction(style: .normal, title: "check in") { (action, sourceView, completionHandler) in
+            // 此為ch10_exercise2 solution 選擇性向下轉型(as?) 轉換為RestaurantTableViewCell型態
+            let cell = tableView.cellForRow(at: indexPath) as? RestaurantTableViewCell
+                cell?.heartImageView.isHidden = self.restaurantIsVisited[indexPath.row]
+            // 存取該餐廳已被勾選
+            self.restaurantIsVisited[indexPath.row] = true
+            
+            completionHandler(true)
+        }
+        
+        if !self.restaurantIsVisited[indexPath.row] {
+            checkinAction.backgroundColor = UIColor(red: 51.0/255.0, green: 212.0/255.0, blue: 149.0/255.0, alpha: 1.0)
+            checkinAction.image = UIImage(systemName: "checkmark")
+        } else {
+            checkinAction.backgroundColor = UIColor(red: 51.0/255.0, green: 212.0/255.0, blue: 149.0/255.0, alpha: 1.0)
+            checkinAction.image = UIImage(systemName: "arrow.uturn.left")
+        }
+        let swipeConfiguration = UISwipeActionsConfiguration(actions: [checkinAction])
+        return swipeConfiguration
+        
+        
+        
+    }    /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.

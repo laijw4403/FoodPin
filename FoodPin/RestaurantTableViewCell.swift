@@ -14,12 +14,12 @@ class RestaurantTableViewCell: UITableViewCell {
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var locationLabel: UILabel!
     @IBOutlet var typeLabel: UILabel!
-    @IBOutlet var thumbnailImageView: UIImageView! /* {
+    @IBOutlet var thumbnailImageView: UIImageView!  {
          didSet {
             thumbnailImageView.layer.cornerRadius = thumbnailImageView.bounds.width / 2 // 設定圖片顯示的圓半徑
             thumbnailImageView.clipsToBounds = true      // 設定圖形可以修剪為圓角
         }
-    } */
+    } 
     @IBOutlet var heartImageView: UIImageView!
     
     override func awakeFromNib() {
