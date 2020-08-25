@@ -23,6 +23,13 @@ class RestaurantTableViewController: UITableViewController {
         super.viewDidLoad()
         // 自動調整cell寬度
         tableView.cellLayoutMarginsFollowReadableWidth = true
+        
+        // 導覽列大標題
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
+        // 停用大標題
+        // navigationItem.largeTitleDisplayMode = .never
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -77,95 +84,95 @@ class RestaurantTableViewController: UITableViewController {
     }
 // MARK: - UITableViewDelegate Methods
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // 建立一個選單作為動作清單
-        let optionMenu = UIAlertController(title: nil, message: "What do you want to do?", preferredStyle: .actionSheet)
-        
-        // For iPad setting 彈出矩形視窗
-        if let popoverController = optionMenu.popoverPresentationController {
-            if let cell = tableView.cellForRow(at: indexPath) {
-                popoverController.sourceView = cell
-                popoverController.sourceRect = cell.bounds
-            }
-        }
-        
-        // 加入動作至選單中
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        optionMenu.addAction(cancelAction)
-        
-        // 加入打電話動作
-        let callActionHandler = { (action:UIAlertAction!) -> Void in
-            let alertMessage = UIAlertController(title: "Service Unavailable", message: "Sorry, the call feature is not available yet. Please retry later.", preferredStyle: .alert)
-            alertMessage.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alertMessage, animated: true, completion: nil)
-        }
-        let callAction = UIAlertAction(title: "Call" + "123-000-\(indexPath.row)", style: .default, handler: callActionHandler)
-        optionMenu.addAction(callAction)
-        
-        
-        // 加入打卡動作 判斷是否已打勾，若尚未打勾顯示check in，若已打勾則顯示Cancel check in
-        if !restaurantIsVisited[indexPath.row] {
-            let checkInAction = UIAlertAction(title: "Check in", style: .default, handler: {
-            (action:UIAlertAction!) -> Void in
-            
-            // 使用indexPath來取得所選取的表格Cell以及所選Cell的索引值
-            //let cell = tableView.cellForRow(at: indexPath)
-            //    cell?.accessoryType = .checkmark
-                
-            // 此為ch10_exercise2 solution 選擇性向下轉型(as?) 轉換為RestaurantTableViewCell型態
-            let cell = tableView.cellForRow(at: indexPath) as? RestaurantTableViewCell
-                cell?.heartImageView.isHidden = self.restaurantIsVisited[indexPath.row]
-            // 存取該餐廳已被勾選
-            self.restaurantIsVisited[indexPath.row] = true
-            })
-            optionMenu.addAction(checkInAction)
-        } else {
-            let checkInCancelAction = UIAlertAction(title: "Undo Check in", style: .default, handler: {
-            (action:UIAlertAction!) -> Void in
-            
-            //let cell = tableView.cellForRow(at: indexPath)
-            //    cell?.accessoryType = .none
-            let cell = tableView.cellForRow(at: indexPath) as? RestaurantTableViewCell
-                cell?.heartImageView.isHidden = self.restaurantIsVisited[indexPath.row]
-            // 存取該餐廳已取消勾選
-            self.restaurantIsVisited[indexPath.row] = false
-            })
-            optionMenu.addAction(checkInCancelAction)
-        }
-        
-        
-        // 呈現選單
-        present(optionMenu, animated: true, completion: nil)
-        
-        // 取消列的選取
-        tableView.deselectRow(at: indexPath, animated: false)
-    }
-    
-    /*
-    // 新增左滑一列時出現Delete按鈕
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        
-        // 從資料模型將資料刪除
-        if editingStyle == .delete {
-            restaurantType.remove(at: indexPath.row)
-            restaurantIsVisited.remove(at: indexPath.row)
-            restaurantNames.remove(at: indexPath.row)
-            restaurantImages.remove(at: indexPath.row)
-            restaurantLocation.remove(at: indexPath.row)
-        }
-        
-        // reload 方法一
-        // tableView.reloadData()
-        
-        // reload 方法二 第一個參數為索引路徑的陣列，第二個參數為動畫類型
-        tableView.deleteRows(at: [indexPath], with: .fade)
-        
-        print("Total item: \(restaurantNames.count)")
-        for name in restaurantNames {
-            print(name)
-        }
-    }
-    */
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        // 建立一個選單作為動作清單
+//        let optionMenu = UIAlertController(title: nil, message: "What do you want to do?", preferredStyle: .actionSheet)
+//
+//        // For iPad setting 彈出矩形視窗
+//        if let popoverController = optionMenu.popoverPresentationController {
+//            if let cell = tableView.cellForRow(at: indexPath) {
+//                popoverController.sourceView = cell
+//                popoverController.sourceRect = cell.bounds
+//            }
+//        }
+//
+//        // 加入動作至選單中
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+//        optionMenu.addAction(cancelAction)
+//
+//        // 加入打電話動作
+//        let callActionHandler = { (action:UIAlertAction!) -> Void in
+//            let alertMessage = UIAlertController(title: "Service Unavailable", message: "Sorry, the call feature is not available yet. Please retry later.", preferredStyle: .alert)
+//            alertMessage.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+//            self.present(alertMessage, animated: true, completion: nil)
+//        }
+//        let callAction = UIAlertAction(title: "Call" + "123-000-\(indexPath.row)", style: .default, handler: callActionHandler)
+//        optionMenu.addAction(callAction)
+//
+//
+//        // 加入打卡動作 判斷是否已打勾，若尚未打勾顯示check in，若已打勾則顯示Cancel check in
+//        if !restaurantIsVisited[indexPath.row] {
+//            let checkInAction = UIAlertAction(title: "Check in", style: .default, handler: {
+//            (action:UIAlertAction!) -> Void in
+//
+//            // 使用indexPath來取得所選取的表格Cell以及所選Cell的索引值
+//            //let cell = tableView.cellForRow(at: indexPath)
+//            //    cell?.accessoryType = .checkmark
+//
+//            // 此為ch10_exercise2 solution 選擇性向下轉型(as?) 轉換為RestaurantTableViewCell型態
+//            let cell = tableView.cellForRow(at: indexPath) as? RestaurantTableViewCell
+//                cell?.heartImageView.isHidden = self.restaurantIsVisited[indexPath.row]
+//            // 存取該餐廳已被勾選
+//            self.restaurantIsVisited[indexPath.row] = true
+//            })
+//            optionMenu.addAction(checkInAction)
+//        } else {
+//            let checkInCancelAction = UIAlertAction(title: "Undo Check in", style: .default, handler: {
+//            (action:UIAlertAction!) -> Void in
+//
+//            //let cell = tableView.cellForRow(at: indexPath)
+//            //    cell?.accessoryType = .none
+//            let cell = tableView.cellForRow(at: indexPath) as? RestaurantTableViewCell
+//                cell?.heartImageView.isHidden = self.restaurantIsVisited[indexPath.row]
+//            // 存取該餐廳已取消勾選
+//            self.restaurantIsVisited[indexPath.row] = false
+//            })
+//            optionMenu.addAction(checkInCancelAction)
+//        }
+//
+//
+//        // 呈現選單
+//        present(optionMenu, animated: true, completion: nil)
+//
+//        // 取消列的選取
+//        tableView.deselectRow(at: indexPath, animated: false)
+//    }
+//
+//    /*
+//    // 新增左滑一列時出現Delete按鈕
+//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//
+//        // 從資料模型將資料刪除
+//        if editingStyle == .delete {
+//            restaurantType.remove(at: indexPath.row)
+//            restaurantIsVisited.remove(at: indexPath.row)
+//            restaurantNames.remove(at: indexPath.row)
+//            restaurantImages.remove(at: indexPath.row)
+//            restaurantLocation.remove(at: indexPath.row)
+//        }
+//
+//        // reload 方法一
+//        // tableView.reloadData()
+//
+//        // reload 方法二 第一個參數為索引路徑的陣列，第二個參數為動畫類型
+//        tableView.deleteRows(at: [indexPath], with: .fade)
+//
+//        print("Total item: \(restaurantNames.count)")
+//        for name in restaurantNames {
+//            print(name)
+//        }
+//    }
+//    */
     
     // 重建Delete功能以及加上一個Share按鈕，使用被定義在UITableViewDelegate的方法
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -220,6 +227,7 @@ class RestaurantTableViewController: UITableViewController {
     }
     
     // ch11 exercise
+    // add right swipe to check in or cancel check in
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let checkinAction = UIContextualAction(style: .normal, title: "check in") { (action, sourceView, completionHandler) in
             // 此為ch10_exercise2 solution 選擇性向下轉型(as?) 轉換為RestaurantTableViewCell型態
@@ -243,7 +251,25 @@ class RestaurantTableViewController: UITableViewController {
         
         
         
-    }    /*
+    }
+    
+    // 將資料從傳至RestaurantDetailViewContoller
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //檢查識別碼
+        if segue.identifier == "showRestaurantDetail" {
+            // 取得所選擇的列
+            if let indexPath = tableView.indexPathForSelectedRow {
+                // 取得目標控制器 此例為RestaurantDetailViewController,因此需向下轉型
+                let destinationController = segue.destination as!        RestaurantDetailViewController
+                // 將圖片名稱傳至目標控制器
+                destinationController.restaurantImageName = restaurantImages[indexPath.row]
+                destinationController.restaurantType = restaurantType[indexPath.row]
+                destinationController.restaurantName = restaurantNames[indexPath.row]
+                destinationController.restaurantLocation = restaurantLocation[indexPath.row]
+            }
+        }
+    }
+    /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
